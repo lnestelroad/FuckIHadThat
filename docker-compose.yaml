@@ -1,3 +1,8 @@
+
+# ================================================================== #
+# command to run: docker-compose up -d
+# site to connect to: http://localhost:5000
+# ================================================================== #
 ---
 version: "3.2"
 
@@ -17,10 +22,11 @@ services:
       - FIHT
     volumes:
       - ./Docker/postgres:/var/lib/postgresql
-      - ./FIHT_schema.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./Database:/docker-entrypoint-initdb.d/
+
   web_server:
     build:
-      context: ./Docker/Server
+      context: ./
       dockerfile: Dockerfile
     image: result/latest
     environment:
