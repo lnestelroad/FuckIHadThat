@@ -1,0 +1,46 @@
+---
+version: "3.2"
+
+networks:
+  FIHT:
+    external: false
+
+services:
+  db:
+    image: postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=FIHT
+      - POSTGRES_PASSWORD=FIHT
+      - POSTGRES_DB=fuckihadthat
+    networks:
+      - FIHT
+    volumes:
+      - ./Docker/postgres:/var/lib/postgresql
+      - ./FIHT_schema.sql:/docker-entrypoint-initdb.d/init.sql
+  web_server:
+    build:
+      context: ./Docker/Server
+      dockerfile: Dockerfile
+    image: result/latest
+    environment:
+      - USER_UID=1000
+      - USER_GID=1000
+      - DB_TYPE=postgres
+      - DB_HOST=db:5432
+      - DB_NAME=fuckihadthat
+      - DB_USER=FIHT
+      - DB_PASSWD=FIHT
+      - PYTHONUNBUFFERED=1
+    restart: always
+    networks:
+      - FIHT
+    volumes:
+      - ./Docker/Server:/data
+      # - /etc/timezone:/etc/timezone:ro
+      # - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "5000:5000"
+      - "2222:22"
+    depends_on:
+      - db
