@@ -12,7 +12,7 @@
         </div> 
         <div class='container'>
             <div class='jumbotron'>
-                <h1 id='header'>Fuck I Had That: Home</h1>
+                <h1 id='header'>Fuck I Had That</h1>
             </div>
         </div>
         <div id='testButton' class='container'>
@@ -28,6 +28,9 @@
                     <div class='col'>
                         <input type="text" class="form-control" placeholder="Expiration Date" name="exp_date">
                     </div>
+                    <div class='col'>
+                        <input type="text" class="form-control" placeholder="Food Type" name="food_type">
+                    </div>
                 </div>
                 <div>
                     <input type="submit" >
@@ -35,18 +38,58 @@
             </form>
         <br>
         </div>
-        {% if data %}
+        <input type="text" id="myInput" onkeyup="myFunction()" placeholder="Search for food, bitch ...">
         <div class='container'>
-            <label>Results</label>
-            {% for person in data %}
-                <ul>
-                    <li>Name: {{person.first}} {{person.last}}</li>
-                    <li>Age: {{person.age}}</li>
-                    <li>ID: {{person.ID}}</li>
-                    <li>Major: {{person.major}}</li>
-                </ul>
-            {% endfor %}
+            <div class="row">
+                <div class="col-sm">
+                    {% if Food %}
+                        <table id="myTable" class="table">
+                            <th>Food</th>
+                            <th>Quantity</th>
+                            <th>Expire</th>
+                        {% for food in Food %}
+                            <tr>
+                                <td>{{food[1]}}</td>
+                                <td>{{food[2]}}</td>
+                                <td>{{food[3]}}</td>
+                            </tr>
+                        {% endfor %}
+                        </table>
+                    {% endif %}
+                </div>
+                <!-- <div class="col-sm">
+                    <label>Perishables</label>
+                    {% if Perishables %}
+                        <table id="myTable" class="table">
+                        {% for perish in Perishables %}
+                            <tr>
+                                <td>{{perish}}</td>
+                            </tr>
+                        {% endfor %}
+                        </table>
+                    {% endif %}
+                </div>
+                <div class="col-sm">
+                    <label>Cans</label>
+                    {% if Cans %}
+                        <ul>
+                        {% for can in Cans %}
+                            <li>{{can}}</li>
+                        {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                <div class="col-sm">
+                    <label>Boxes</label>
+                    {% if Boxes %}
+                        <ul>
+                        {% for box in Boxes %}
+                            <li>{{box}}</li>
+                        {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div> -->
+            </div>
         </div>
-        {% endif %}
     </body>
 </html>

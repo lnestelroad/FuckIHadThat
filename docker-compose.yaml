@@ -15,13 +15,13 @@ services:
     image: postgres
     restart: always
     environment:
-      - POSTGRES_USER=FIHT
-      - POSTGRES_PASSWORD=FIHT
+      - POSTGRES_USER=fiht
+      - POSTGRES_PASSWORD=fiht
       - POSTGRES_DB=fuckihadthat
     networks:
       - FIHT
     volumes:
-      - ./Docker/postgres:/var/lib/postgresql
+      - ./Docker/postgres:/var/lib/postgresql/data
       - ./Database:/docker-entrypoint-initdb.d/
 
   web_server:

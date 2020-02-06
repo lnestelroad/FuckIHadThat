@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import os
-import sqlite3
+import psycopg2 as psql
 import argparse
 import datetime
 
@@ -28,16 +28,15 @@ class Database():
         """
         try:
             self.path = os.path.dirname(os.path.abspath(__file__))
-            print(self.path)
 
             # Create a connection to the database
-            self.cxn = psql.connect(host="db",database="fuckihadthat", user="FIHT", password="FIHT")
+            self.cxn = psql.connect(host="db",database="fuckihadthat", user="fiht", password="fiht")
             print("Opening Connections to database")
 
             # Create a cursor from the database connection
             self.cursor = self.cxn.cursor()
 
-        except sqlite3.Error as error:
+        except psql.Error as error:
             print("Error connecting to database. " + str(error))
 
     def setupTables(self):
@@ -50,11 +49,12 @@ class Database():
         """
 
         # Creates a table for Pictures
-        Food = "CREATE TABLE Food( \
+        Food = "CREATE TABLE IF NOT EXISTS Food( \
             food_id SERIAL PRIMARY KEY, \
             food_name VARCHAR (100) NOT NULL, \
             food_quantity FLOAT NOT NULL, \
-            food_expiration DATE
+            food_expiration DATE, \
+            food_type VARCHAR(100)\
             );"
         self.cursor.execute(Food)
 
@@ -71,23 +71,26 @@ class Database():
 
     def Destroy(self):
         """ Destroys the database. For testing pusposes only """
-        self.cursor.execute("DROP TABLE Food;")
+        self.cursor.execute("DROP TABLE IF EXISTS Food;")
         self.commitChanges()
+
+        return
 
 ################### Database inserting ########################################
 
-    def addFood(self, _name, _quant, _expiration=0):
+    def addFood(self, name, quant, expiration, food_type):
         """
             Summary: Here is where the admin will be able to add new rooms the the database. Will probably never be used except during setup.
             Input:  Requires a name for the room
             Output: New entry in the rooms table
         """
-        if _expiration == 0:
-            self.cursor.execute("INSERT INTO Food (food_name, food_quantity) VALUES (?, ?);", (_name, _quant))
-        self.cursor.execute("INSERT INTO Food (food_name, food_quantity, food_expiration) VALUES (?, ?, ?);", (_name, _quant, _expiration))
+        if expiration == '0':
+            self.cursor.execute("INSERT INTO Food (food_name, food_quantity, food_type) VALUES ('{}', '{}', '{}');".format(name, quant, food_type))
+        else:
+            self.cursor.execute("INSERT INTO Food (food_name, food_quantity, food_expiration, food_type) VALUES ('{}', '{}', '{}' ,'{}');".format(name, quant, expiration, food_type))
     
 #################### Database retrieval #######################################
-    def getUsers(self, foodName):
+    def getFoodItem(self, foodName):
         """
             Summary: This will be used by the GUI to show the admin the current Users Table. Using the request amount method, this function will only
                 return a limited amount
@@ -95,19 +98,25 @@ class Database():
             Output: All entries in the user table <list of tuples>
         """
         # Here the SELECT has no ORDER BY since the users table is not dependent on times
-        self.cursor.execute("SELECT * FROM Food WHERE food_name = ?;", (foodName))
+        self.cursor.execute("SELECT * FROM Food WHERE food_name = {};".format(foodName))
 
-            # retrieves all entries should the user not give a request amount
-            food_entries = self.cursor.fetchall()
+        # retrieves all entries should the user not give a request amount
+        food_entries = self.cursor.fetchall()
 
         return food_entries
+
+    def getAllFood(self):
+        self.cursor.execute("SELECT * FROM Food;")
+        food = self.cursor.fetchall()
+
+        return food
     
 #################### Database removal #########################################
     def removeFood(self, _foodName):
         """
             Summary: This is what will be called whenever a user is needed to be removed from the database
         """
-        self.cursor.execute("DELETE FROM Food WHERE UserName = ?;", (_foodName,))
+        self.cursor.execute("DELETE FROM Food WHERE UserName = {};".format(_foodName,))
         self.commitChanges()
         
 ############################################################## Main Testing

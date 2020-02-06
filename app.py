@@ -8,11 +8,30 @@ app = Flask(__name__)
 
 @app.route('/')
 def hello():
-    return render_template("index.html", data=data)
+    db = database_interface.Database()
+    db.connectToDatabase()
 
-@app.route('/data/', methods=['GET'])
+    food = db.getAllFood()
+    return render_template("index.html", Food=food)
+
+@app.route('/input/', methods=['POST'])
 def db():
-    return render_template("index.html", data=data)
+
+    if request.method == "POST":
+        food_name = request.form['food_name']
+        food_quantity = request.form['food_quantity']
+        expire = request.form['exp_date']
+        food_type = request.form['food_type']
+
+        db = database_interface.Database()
+        db.connectToDatabase()
+
+        db.addFood(food_name, int(food_quantity), expire, food_type)
+        db.commitChanges()
+
+        food = db.getAllFood()
+
+    return render_template("index.html", Food=food)
 
 if __name__ == '__main__':
     app.run(debug=True)
